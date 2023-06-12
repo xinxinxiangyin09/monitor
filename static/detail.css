@@ -1,0 +1,62 @@
+@font-face {
+    font-family: "LiShu";
+    src: url(./SIMLI.TTF);
+}
+.content_back_ground{
+    width: 85%;
+    background-color: rgba(16, 181, 223, 0.3);
+    padding-top: 5px;
+    padding-bottom: 5px;
+    margin: 20px auto;
+    border-radius: 20px;
+}
+.content_title{
+    width: 90%;
+    padding: 10px;
+    margin: 2px auto;
+    margin-top: 20px;
+    text-align: center;
+    color: black;
+    background-color: rgb(16, 181, 223, 0.3);
+    font-size: 1.4em;
+    font-family: "LiShu";
+    border-radius: 20px;
+}
+table{
+    width: 80%;
+    margin: 20px auto;
+    text-align: center;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+}
+.gauge_outfit{
+    font-weight: bold;
+}
+.green_status{
+    background-color: rgb(0, 200, 0);
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    margin: 10px auto;
+}
+.red_status{
+    background-color: rgb(236, 62, 39);
+    height: 15px;
+    width: 15px;
+    border-radius: 50%;
+    margin: 10px auto;
+}
+tr{
+    height: 40px;
+}
+td{
+    padding: 10px;
+}
+.prompt{
+    font-size: 1px;
+    text-align: left;
+    font-weight: bold;
+}
+.tr_info:hover{
+    background-color: rgb(90, 205, 205);
+}

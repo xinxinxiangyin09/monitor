@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    详情
+{% endblock %}
+
+{% block styles %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='detail.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="content_back_ground">
+        <div class="content_title">基本信息</div>
+        <table border="3" align="center">
+            <tr class="gauge_outfit">
+                <td>主机标识符</td>
+                <td>IP地址</td>
+                <td>主机状态</td>
+                <td>SSH状态</td>
+                <td>CPU使用率</td>
+                <td>内存使用率</td>
+                <td>磁盘使用率</td>
+                <td>监测端口</td>
+            </tr>
+            <tr>
+                <td>{{ data.host_id }}</td>
+                <td>{{ data.ip_addr }}</td>
+                <td>
+                    {% if data.ip_status == 0 %}
+                        <div class="green_status"></div>
+                    {% else %}
+                        <div class="red_status"></div>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.ssh_status == 0 %}
+                        <div class="green_status"></div>
+                    {% else %}
+                        <div class="red_status"></div>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.cpu_proportion %}
+                        {{ data.cpu_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.cpu_proportion %}
+                        {{ data.cpu_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.cpu_proportion %}
+                        {{ data.cpu_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="port_info_back">
+                        {% if data.ports_info %}
+                            {% for port_info in data.ports_info %}
+                                {% if port_info.status == 'listen' %}
+                                    <div class="port_info" style="color:green;">{{ port_info.port }}&ensp;</div>
+                                {% else %}
+                                    <div class="port_info" style="color:red;">{{ port_info.port }}&ensp;</div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                        ERROR
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="8" class="prompt">说明：绿色表示正常运行，红色表示异常！</td>
+            </tr>
+        </table>
+
+        <div class="content_title">进程信息</div>
+        <table border="3" align="center">
+            <tr class="gauge_outfit">
+                <td>系统运行进程</td>
+                <td>系统总进程</td>
+                <td>进程占用率</td>
+            </tr>
+            <tr>
+                <td>
+                    {% if data.cpu_used %}
+                        {{ data.cpu_used }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.cpu_count %}
+                        {{ data.cpu_count }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.cpu_proportion %}
+                        {{ data.cpu_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+
+        <div class="content_title">内存信息</div>
+        <table border="3" align="center">
+            <tr class="gauge_outfit">
+                <td>占用内存</td>
+                <td>总内存</td>
+                <td>内存占用率</td>
+            </tr>
+            <tr>
+                <td>
+                    {% if data.memory_used %}
+                        {{ data.memory_used }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.memory_count %}
+                        {{ data.memory_count }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.memory_proportion %}
+                        {{ data.memory_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3" class="prompt">提示：该项信息展示单位为KB。</td>
+            </tr>
+        </table>
+
+        <div class="content_title">磁盘信息</div>
+        <table border="3" align="center">
+            <tr class="gauge_outfit">
+                <td>磁盘占用容量</td>
+                <td>磁盘总容量</td>
+                <td colspan="3">磁盘占用率</td>
+            </tr>
+            <tr>
+                <td>
+                    {% if data.disk_used %}
+                        {{ data.disk_used }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td>
+                    {% if data.disk_count %}
+                        {{ data.disk_count }}
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+                <td colspan="3">
+                    {% if data.disk_proportion %}
+                        {{ data.disk_proportion }}%
+                    {% else %}
+                        ERROR
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" class="prompt"></td>
+            </tr>
+            <tr class="gauge_outfit">
+                <td>路径</td>
+                <td>总容量</td>
+                <td>使用容量</td>
+                <td>空闲容量</td>
+                <td>占用率</td>
+            </tr>
+            {% if data.disk_detail %}
+                {% for info in data.disk_detail %}
+                    <tr class="tr_info">
+                        <td>{{ info.path }}</td>
+                        <td>{{ info.count_disk }}</td>
+                        <td>{{ info.used_disk }}</td>
+                        <td>{{ info.not_used_disk }}</td>
+                        <td>{{ info.proportion }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                    <tr>
+                        <td colspan="5">ERROR</td>
+                    </tr>
+            {% endif %}
+            <tr>
+                <td colspan="5" class="prompt">提示：该项信息展示单位为KB。</td>
+            </tr>
+        </table>
+
+        <div class="content_title">端口信息</div>
+        <table border="3" align="center">
+            <tr class="gauge_outfit">
+                <td>端口号</td>
+                <td>状态</td>
+            </tr>
+            {% if data.ports_info %}
+                {% for port in data.ports_info %}
+                    <tr class="tr_info">
+                        <td>{{ port.port }}</td>
+                        <td>{{ port.status | upper_ }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                    <tr>
+                        <td colspan="2">ERROR</td>
+                    </tr>
+            {% endif %}
+        </table>
+
+    </div>
+{% endblock %}

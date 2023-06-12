@@ -1,0 +1,13 @@
+mysql_server:
+  host: 127.0.0.1
+  port: 12306
+  username: root
+  password: 0
+  database: monitor
+  charset: utf8mb4
+redis_server:
+  host: 127.0.0.1
+  port: 12308
+  password: password
+  db: 0
+web_port: 8088

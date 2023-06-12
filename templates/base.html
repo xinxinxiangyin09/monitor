@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
+    <title>
+        {% block title %}{% endblock %}
+    </title>
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <div class="back_ground">
+        <div class="title_text">服&emsp;务&emsp;器&emsp;监&emsp;控&emsp;平&emsp;台</div>
+        {% block content %}{% endblock %}
+    </div>
+</body>
+{% block scripts %}{% endblock %}
+</html>
