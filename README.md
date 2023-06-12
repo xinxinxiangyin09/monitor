@@ -395,4 +395,4 @@ pip install --no-index --find-links=/data/code/monitor/pip_package -r /data/code
 
 ## 五、启动
 
-`flask run`
+`./root/virtualenv/monitor/bin/python3 -m flask run`
