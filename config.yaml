@@ -8,6 +8,6 @@ mysql_server:
 redis_server:
   host: 127.0.0.1
   port: 12308
-  password: password
+  password: default
   db: 0
-web_port: 8088
+web_port: 8080

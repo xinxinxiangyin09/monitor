@@ -3,7 +3,6 @@ CREATE DATABASE `monitor` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';
 
 -- creating tables.
 SET NAMES utf8mb4;
-SET FOREIGN_KEY_CHECKS = 0;
 
 DROP TABLE IF EXISTS `connect_info`;
 CREATE TABLE `connect_info`  (
@@ -40,11 +39,14 @@ CREATE TABLE `server_info`  (
   CONSTRAINT `serverID_id` FOREIGN KEY (`host_id`) REFERENCES `connect_info` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci ROW_FORMAT = Dynamic;
 
-SET FOREIGN_KEY_CHECKS = 1;
-
 -- insert into data
+SET FOREIGN_KEY_CHECKS = 0;
+
 INSERT INTO `connect_info` VALUES (1, '192.168.0.104', 22, 'root', '0', '21,22,3306,12306', 0);
 INSERT INTO `connect_info` VALUES (2, '192.168.0.108', 22, 'root', '0', '6379,27017,12308', 0);
 
+
 INSERT INTO `server_info` VALUES (1, 1, 1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2023-06-10 03:43:18');
 INSERT INTO `server_info` VALUES (2, 2, 0, 0, 3, 219, '1.0', 1016232, 821064, '81.0', 35345820, 4633080, 13, '[{\"path\": \"/dev/mapper/centos-root\", \"count_disk\": 13092864, \"used_disk\": 3549264, \"not_used_disk\": 9543600, \"proportion\": \"28%\"}, {\"path\": \"devtmpfs\", \"count_disk\": 497064, \"used_disk\": 0, \"not_used_disk\": 497064, \"proportion\": \"0%\"}, {\"path\": \"tmpfs\", \"count_disk\": 508116, \"used_disk\": 0, \"not_used_disk\": 508116, \"proportion\": \"0%\"}, {\"path\": \"tmpfs\", \"count_disk\": 508116, \"used_disk\": 6860, \"not_used_disk\": 501256, \"proportion\": \"2%\"}, {\"path\": \"tmpfs\", \"count_disk\": 508116, \"used_disk\": 0, \"not_used_disk\": 508116, \"proportion\": \"0%\"}, {\"path\": \"/dev/sdb1\", \"count_disk\": 19091584, \"used_disk\": 949560, \"not_used_disk\": 17165540, \"proportion\": \"6%\"}, {\"path\": \"/dev/sda1\", \"count_disk\": 1038336, \"used_disk\": 127396, \"not_used_disk\": 910940, \"proportion\": \"13%\"}, {\"path\": \"tmpfs\", \"count_disk\": 101624, \"used_disk\": 0, \"not_used_disk\": 101624, \"proportion\": \"0%\"}]', '[{\"port\": 6379, \"status\": \"closed\"}, {\"port\": 27017, \"status\": \"closed\"}, {\"port\": 12308, \"status\": \"listen\"}]', '2023-06-10 03:43:18');
+
+SET FOREIGN_KEY_CHECKS = 1;

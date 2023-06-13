@@ -176,23 +176,15 @@ class Monitor(object):
             # port info
             port_info_list = []
             for port in port_list:
-                stdin, stdout, stderr = ssh_client.exec_command("rpm -qa | grep net-tools")
-                if stdout is None:
-                    # install net-tools
-                    sftp = paramiko.Transport(sock=(host, port))
-                    sftp.connect(username=username, password=password)
-                    rpm = paramiko.SFTPClient.from_transport(sftp)
-                    rpm_file = os.path.join(os.path.join(os.path.join(sys.path[0], "base"), "rpms"), "net-tools-2.0-0.25.20131004git.el7.x86_64.rpm")
-                    rpm.put(rpm_file, "/root/")
-                    sftp.close()
-                    stdin, stdout, stderr = ssh_client.exec_command("rpm -ivh /root/net-tools-2.0-0.25.20131004git.el7.x86_64.rpm")
-                    stdin, stdout, stderr = ssh_client.exec_command("rm -rf /root/net-tools-2.0-0.25.20131004git.el7.x86_64.rpm")
                 stdin, stdout, stderr = ssh_client.exec_command("netstat -tunlp | grep %s" % port)
-                port_response = stdout.read().decode()
-                if port_response:
-                    port_info_list.append({"port": port, "status": "listen"})
+                port_response = stdout.read().decode(), stderr.read().decode()
+                if "bash: netstat" in port_response[1]:
+                    port_info_list.append({"port": port, "status": "faild"})
                 else:
-                    port_info_list.append({"port": port, "status": "closed"})
+                    if len(port_response[0]) == 0:
+                        port_info_list.append({"port": port, "status": "closed"})
+                    else:
+                        port_info_list.append({"port": port, "status": "listen"})
             port_info = port_info_list
 
         except paramiko.ssh_exception.AuthenticationException:
@@ -204,6 +196,14 @@ class Monitor(object):
             port_info = "-"
 
         except paramiko.ssh_exception.NoValidConnectionsError:
+            ip = 1
+            ssh_status = "failed"
+            cpu = "-"
+            memory = "-"
+            disk_info = "-"
+            port_info = "-"
+
+        except Exception:
             ip = 1
             ssh_status = "failed"
             cpu = "-"
@@ -235,9 +235,13 @@ class Monitor(object):
             ssh_status = 0
         try:
             disk_info = json.dumps(data.get("disk").get("info"))
-            port_info = json.dumps(data.get("port_info"))
         except AttributeError:
-            disk_info = port_info = None
+            disk_info = None
+        try:
+            port_info = json.dumps(data.get("port_info"))
+        except Exception:
+            port_info = "error"
+            
         try:
             data = [
                 int(data.get("id")),

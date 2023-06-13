@@ -80,13 +80,17 @@ class Data(object):
         host_id_list = []
         for host_id in self.cursor.fetchall():
             host_id_list.append(host_id.get("id"))
-        host_id_list.reverse()
+        # host_id_list.reverse()
 
         server_info_list = []
         for host_id in host_id_list:
-            sql = "SELECT host_id,ip_status,ssh_status,cpu_proportion,memory_proportion,disk_proportion,ports_info,created FROM server_info WHERE host_id = %s ORDER BY created LIMIT 1;"
+            sql = "SELECT host_id,ip_status,ssh_status,cpu_proportion,memory_proportion,disk_proportion,ports_info,created FROM server_info WHERE host_id = %s ORDER BY created DESC LIMIT 1;"
             self.cursor.execute(sql, [host_id,])
-            server_info = self.cursor.fetchall()[0]
+            try:
+                server_info = self.cursor.fetchall()[0]
+            except IndexError:
+                server_info = None
+
             # get ip address
             sql = "SELECT ip_addr FROM connect_info WHERE id = %s and is_true = 0;" % server_info["host_id"]
             self.cursor.execute(sql)

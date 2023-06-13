@@ -1,36 +1,30 @@
 .content > div{
     height: 20px;
-    width: 20px;
     border-radius: 50%;
-    margin: 5px auto;
+    margin: 0 auto;
 }
 .port_info{
     float: left;
-    padding-left: 20px;
+    padding-left: 10px;
 }
 .port_info_back{
     text-align: center;
 }
 table{
-    width: 80%;
-    margin: 20px auto;
+    width: 98%;
+    margin: 0 auto;
     text-align: center;
     border-collapse: collapse;
 }
-tr{
-    height: 40px;
-}
 tr:hover{
     background-color: rgb(90, 205, 205);
-}
-td{
-    padding: 10px;
 }
 content_title {
     font-weight: bold;
 }
 .content_title{
     font-weight: bold;
+    height: 40px;
 }
 .content_title:hover{
     background: none;

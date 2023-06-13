@@ -69,11 +69,11 @@ class Init(object):
 
         try:
             redis = redis.Redis(
-                host=str(config.get("db_redis").get("host")),
-                port=int(config.get("db_redis").get("port")),
-                username=str(config.get("db_redis").get("user")),
-                password=str(config.get("db_redis").get("password")),
-                db=int(config.get("db_redis").get("db"))
+                host=str(config.get("redis_server").get("host")),
+                port=int(config.get("redis_server").get("port")),
+                username=str(config.get("redis_server").get("user")),
+                password=str(config.get("redis_server").get("password")),
+                db=int(config.get("redis_server").get("db"))
             )
             myPrint(info="Congratulations, your redis server is ready to use !")
         except Exception:
@@ -91,13 +91,13 @@ class Init(object):
 
         try:
             db = pymysql.connect(
-                host=str(config.get("db_mysql").get("host")),
-                port=int(config.get("db_mysql").get("port")),
-                user=str(config.get("db_mysql").get("user")),
-                password=str(config.get("db_mysql").get("password")),
+                host=str(config.get("mysql_server").get("host")),
+                port=int(config.get("mysql_server").get("port")),
+                user=str(config.get("mysql_server").get("username")),
+                password=str(config.get("mysql_server").get("password")),
                 # database=str(config.get("db_mysql").get("database")),
                 database="mysql",
-                charset=str(config.get("db_mysql").get("charset"))
+                charset=str(config.get("mysql_server").get("charset"))
             )
 
             myPrint(info="Congratulations, your MySQL server is ready to use !")
@@ -108,14 +108,14 @@ class Init(object):
         # create database
         cursor = db.cursor()
         try:
-            cursor.execute("CREATE DATABASE `%s` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';" % config.get("db_mysql").get("database"))
+            cursor.execute("CREATE DATABASE `%s` CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci';" % config.get("mysql_server").get("database"))
             db.commit()
-            myPrint(info="Successfully created database %s." % config.get("db_mysql").get("database"))
+            myPrint(info="Successfully created database %s." % config.get("mysql_server").get("database"))
         except pymysql.Error as err:
             if "database exists" in str(err):
-                myPrint(grade=0, info="MySQL database %s already exists, no need to create it again." % config.get("db_mysql").get("database"))
+                myPrint(grade=0, info="MySQL database %s already exists, no need to create it again." % config.get("mysql_server").get("database"))
             else:
-                myPrint(grade=1, info="MySQL created database %s was failed. Please check account %s permissions for %s" % (config.get("db_mysql").get("database"), config.get("db_mysql").get("user"), err))
+                myPrint(grade=1, info="MySQL created database %s was failed. Please check account %s permissions for %s" % (config.get("mysql_server").get("database"), config.get("db_mysql").get("user"), err))
                 sys.exit()
         cursor.close()
         db.close()
@@ -123,20 +123,23 @@ class Init(object):
 
         # create table desc
         db = pymysql.connect(
-            host=str(config.get("db_mysql").get("host")),
-            port=int(config.get("db_mysql").get("port")),
-            user=str(config.get("db_mysql").get("user")),
-            password=str(config.get("db_mysql").get("password")),
-            database=str(config.get("db_mysql").get("database")),
+            host=str(config.get("mysql_server").get("host")),
+            port=int(config.get("mysql_server").get("port")),
+            user=str(config.get("mysql_server").get("username")),
+            password=str(config.get("mysql_server").get("password")),
+            database=str(config.get("mysql_server").get("database")),
             # database="mysql",
-            charset=str(config.get("db_mysql").get("charset"))
+            charset=str(config.get("mysql_server").get("charset"))
         )
         cursor = db.cursor()
 
         sql_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "init.sql")
-        f = open(sql_path, "r", encoding="gbk")
+        f = open(sql_path, "r", encoding="utf-8")
         sql = f.read().replace("(\n", "(").replace(",\n", ",").replace(")\n", ")").replace("(\n", "").replace(",\n", ",").replace("  ","")
         f.close()
+
+        # close foregin key
+        # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
         create_table_sql_list = []
         insert_data_sql_list = []
@@ -172,13 +175,16 @@ class Init(object):
                     myPrint(grade=1, info="SQL syntax error. %s" % sql)
                     sys.exit()
                 else:
-                    myPrint(grade=1, info="unknown error. %s" % sql)
+                    myPrint(grade=1, info="unknown error. %s" % err)
                     sys.exit()
             except Exception as err:
                 myPrint(grade=1, info="unknown error, %s. %s" % (err, sql))
                 sys.exit()
         db.commit()
         myPrint(info="MySQL database initialization completed.")
+
+        # open foregin key
+        # cursor.execute("SET FOREIGN_KEY_CHECKS = 1;")
 
         cursor.close()
         db.close()

@@ -14,19 +14,21 @@ body{
 .back_ground{
     width: 95%;
     margin: 20px auto;
+    margin-top: 0;
     border-radius: 15px;
     background: rgba(255, 255, 255, 0.6);
     padding-bottom: 20px;
-    padding-top: 20px;
+    padding-top: 0;
 }
 .title_text{
     margin: 40px auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
     padding: 20px;
     width: 85%;
-    height: 40px;
     background-color: rgba(16, 181, 223, 0.699);
     border-radius: 15px;
-    font-size: 2em;
+    font-size: 1.5em;
     text-align: center;
     font-weight: bold;
     color: white;
