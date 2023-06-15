@@ -22,7 +22,6 @@ app.add_template_filter(upper_)
 @app.route("/index")
 def index():
     data = Data().index_data()
-    # print(data)
     return render_template("index.html", data=data)
 
 @app.route("/<host_id>")

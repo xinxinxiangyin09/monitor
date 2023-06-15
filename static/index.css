@@ -1,3 +1,7 @@
+@font-face {
+    font-family: "LiShu";
+    src: url(./SIMLI.TTF);
+}
 .content > div{
     height: 20px;
     border-radius: 50%;
@@ -10,11 +14,21 @@
 .port_info_back{
     text-align: center;
 }
+.group_title{
+    width: 100%;
+    padding-top: 15px;
+    text-align: center;
+    font-size: large;
+    font-family: "LiShu";
+}
 table{
     width: 98%;
     margin: 0 auto;
     text-align: center;
     border-collapse: collapse;
+}
+tr{
+    font-size: 0.6em;
 }
 tr:hover{
     background-color: rgb(90, 205, 205);

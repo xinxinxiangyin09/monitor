@@ -74,40 +74,72 @@ class Data(object):
                 Myprint(grade=1, info="Redis server username or password is faild.")
             sys.exit()
 
-    def index_data(self):
-        sql = "SELECT id FROM connect_info;"
-        self.cursor.execute(sql)
-        host_id_list = []
-        for host_id in self.cursor.fetchall():
-            host_id_list.append(host_id.get("id"))
-        # host_id_list.reverse()
-
+    def base_info(self, host_id):
         server_info_list = []
-        for host_id in host_id_list:
-            sql = "SELECT host_id,ip_status,ssh_status,cpu_proportion,memory_proportion,disk_proportion,ports_info,created FROM server_info WHERE host_id = %s ORDER BY created DESC LIMIT 1;"
-            self.cursor.execute(sql, [host_id,])
-            try:
-                server_info = self.cursor.fetchall()[0]
-            except IndexError:
-                server_info = None
+        sql = "SELECT host_id,ip_status,ssh_status,cpu_proportion,memory_proportion,disk_proportion,ports_info,created FROM server_info WHERE host_id = %s ORDER BY created DESC LIMIT 1;"
+        self.cursor.execute(sql, [host_id,])
+        try:
+            server_info = self.cursor.fetchall()[0]
+        except IndexError:
+            server_info = None
 
-            # get ip address
-            sql = "SELECT ip_addr FROM connect_info WHERE id = %s and is_true = 0;" % server_info["host_id"]
-            self.cursor.execute(sql)
-            server_info["ip_addr"] = self.cursor.fetchall()[0]["ip_addr"]
-            ports_info = server_info.get("ports_info")
-            try:
-                ports_info = json.loads(ports_info)
-                server_info["ports_info"] = ports_info
-            except AttributeError:
-                ports_info = None
-            except TypeError:
-                ports_info = None
-            finally:
-                server_info_list.append(server_info)
+        # get ip address
+        sql = "SELECT ip_addr,nickname,uuid FROM connect_info WHERE id = %s and is_true = 0;" % server_info["host_id"]
+        self.cursor.execute(sql)
+
+        result = self.cursor.fetchall()[0]
+
+        server_info["uuid"] = result["uuid"]
+        server_info["ip_addr"] = result["ip_addr"]
+        server_info["nickname"] = result["nickname"]
+
+        ports_info = server_info.get("ports_info")
+
+
+
+        try:
+            ports_info = json.loads(ports_info)
+            server_info["ports_info"] = ports_info
+        except AttributeError:
+            ports_info = None
+        except TypeError:
+            ports_info = None
+        finally:
+            server_info_list.append(server_info)
 
         return server_info_list
         
+    def index_data(self):
+        sql = "SELECT connect_info.id,group_info.`name` FROM connect_info,group_info WHERE connect_info.group_id = group_info.id;"
+        self.cursor.execute(sql)
+        host_info_list = []
+        for item in self.cursor.fetchall():
+            host_info_list.append(item)
+        
+        group_info_list = []
+        for host_info in host_info_list:
+            group_info_list.append(host_info.get("name"))
+        group_info_list = set(group_info_list)
+
+        host_data = []
+        for group_info in group_info_list:
+            group_name_list = []
+            for host_info in host_info_list:
+                if group_info == host_info["name"]:
+                    group_name_list.append(host_info["id"])
+            host_data.append({group_info: group_name_list})
+
+        data = []
+        for host_info in host_data:
+            group_name = list(host_info.keys())[0]
+            server_info_list = []
+            for server_info in host_info[group_name]:
+                server_info_list.append(self.base_info(host_id = server_info))
+            data.append({"key": group_name, "value": server_info_list})
+        # print(data)
+        # host_id_list.reverse()
+        return data
+
     def detail_data(self, host_id):
         sql = "SELECT connect_info.ip_addr,host_id,ip_status,ssh_status,cpu_used,cpu_count,cpu_proportion,memory_count,memory_used,memory_proportion,disk_count,disk_used,disk_proportion,disk_detail,ports_info,created FROM server_info,connect_info WHERE connect_info.id = server_info.host_id AND server_info.host_id = %s ORDER BY created desc LIMIT 1;"
         self.cursor.execute(sql, [host_id, ])
@@ -135,5 +167,7 @@ class Data(object):
         self.redis_db.close()
 
 
-# if __name__ == "__main__":
-#     db = Data()
+if __name__ == "__main__":
+    db = Data()
+    index_data = db.index_data()
+    print(index_data)

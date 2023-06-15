@@ -4,6 +4,7 @@ import re
 import datetime
 import json
 import telnetlib
+import random
 
 import yaml
 import pymysql
@@ -77,13 +78,39 @@ class Monitor(object):
             sys.exit()
 
     def get_connection(self):
-        sql = "SELECT `id`, `ip_addr`,`port`,`username`,`password`,`listen_ports` FROM connect_info WHERE `is_true` = 0;"
+
+        # create uuid
+        def create_uuid(host):
+            while True:
+                sql = "UPDATE connect_info SET `uuid` = %s WHERE `ip_addr` = %s;"
+                ascii_lowercase, number = "abcde", "1234567890"
+                uuid = []
+                for i in range(5):
+                    uuid.append(random.choice(ascii_lowercase + ascii_lowercase + number))
+                uuid = "".join(uuid)
+                try:    
+                    self.cursor.execute(sql, [uuid, host, ])
+                    self.db.commit()
+                    return uuid
+                except Exception:
+                    continue
+
+        sql = "SELECT `id`, `ip_addr`,`port`,`username`,`password`,`listen_ports`,`uuid` FROM connect_info WHERE `is_true` = 0;"
         self.cursor.execute(sql)
         connection_list = []
         for connection in self.cursor.fetchall():
             ports = []
             for port in connection[5].split(","):
                 ports.append(int(port))
+            if connection[6] is None:
+                Myprint("UUID is null for %s, it will be automatically generated." % connection[1])
+                uuid = create_uuid(connection[1])
+                if uuid is None:
+                    Myprint(grade=1, info="UUID automatically generated is failed for %s." % connection[1])
+                else:
+                    Myprint(info="UUID automatically generated is scuessed for %s." % connection[1])
+            else:
+                uuid = connection[6]
             connection_list.append(
                 {
                     "id": connection[0],
@@ -92,6 +119,7 @@ class Monitor(object):
                     "username": connection[3],
                     "password": connection[4],
                     "ports": ports,
+                    "uuid": uuid
                 }
             )
         

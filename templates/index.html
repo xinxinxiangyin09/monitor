@@ -9,88 +9,95 @@
 
     {% block content %}
         <div class="content">
-            <table border="3" align="center">
-                <tr class="content_title">
-                    <td>主机标识符</td>
-                    <td>主机地址</td>
-                    <td>主机通信</td>
-                    <td>SSH状态</td>
-                    <td>CPU使用率</td>
-                    <td>内存使用率</td>
-                    <td>磁盘使用率</td>
-                    <td>开放端口</td>
-                    <td>最后检查时间</td>
-                    <td>操作</td>
-                </tr>
-                {% for server in data %}
-                <tr>
-                    <td>{{ server.host_id }}</td>
-                    <td>{{ server.ip_addr }}</td>
-                    <td>
-                        <div style="margin: 10px auto; background-color:
-                        {% if server.ip_status == 0 %}
-                        green
-                        {% else %}
-                        red
-                        {% endif %}
-                         ; height: 15px; width: 15px; border-radius: 50%;"></div>
-                    </td>
-                    <td>
-                        <div style="margin: 10px auto; background-color:
-                        {% if server.ssh_status == 0 %}
-                        green
-                        {% else %}
-                        red
-                        {% endif %}
-                         ; height: 15px; width: 15px; border-radius: 50%;"></div>
-                    </td>
-                    <td>
-                        {% if server.cpu_proportion %}
-                        {{ server.cpu_proportion }}% 
-                        {% else %}
-                        0% 
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if server.memory_proportion %}
-                        {{ server.memory_proportion }}% 
-                        {% else %}
-                        0% 
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if server.disk_proportion %}
-                        {{ server.disk_proportion }}% 
-                        {% else %}
-                        0% 
-                        {% endif %}
-                    </td>
-                    <td>
-                        <div class="port_info_back">
-                            {% if server.ports_info %}
-                                {% for port_info in server.ports_info %}
-                                    {% if port_info.status == 'listen' %}
-                                        <span style="color:green;">{{ port_info.port }}</span>&ensp;
-                                    {% elif port_info.status == 'closed' %}
-                                        <span style="color:red;">{{ port_info.port }}</span>&ensp;
+            {% for server_list in data %}
+                <div class="group_title"><span>{{ server_list.key }}</span></div>
+                <table border="3" align="center">
+                    <tr class="content_title">
+                        <td>主机标识符</td>
+                        <td>设备名</td>
+                        <td>主机地址</td>
+                        <td>主机通信</td>
+                        <td>SSH状态</td>
+                        <td>CPU使用率</td>
+                        <td>内存使用率</td>
+                        <td>磁盘使用率</td>
+                        <td>开放端口</td>
+                        <td>最后检查时间</td>
+                        <td>操作</td>
+                    </tr>
+                    {% for server_info in server_list.value %}
+                        {% for server in server_info %}
+                            <tr>
+                                <td>{{ server.uuid }}</td>
+                                <td>{{ server.nickname }}</td>
+                                <td>{{ server.ip_addr }}</td>
+                                <td>
+                                    <div style="margin: 10px auto; background-color:
+                                    {% if server.ip_status == 0 %}
+                                    green
                                     {% else %}
-                                        <span style="color:blueviolet;">{{ port_info.port }}</span>&ensp;
+                                    red
                                     {% endif %}
-                                {% endfor %}
-                            {% else %}
-                                <span style="color:red;">ERROR</span>
-                            {% endif %}
-                        </div>
-                    </td>
-                    <td>
-                        {{ server.created }}
-                    </td>
-                    <td>
-                        <a href="/{{ server.host_id }}" target="_blank">查看详情</a>
-                    </td>
-                </tr>
-                {% endfor %}
-                
-            </table>
+                                    ; height: 15px; width: 15px; border-radius: 50%;"></div>
+                                </td>
+                                <td>
+                                    <div style="margin: 10px auto; background-color:
+                                    {% if server.ssh_status == 0 %}
+                                    green
+                                    {% else %}
+                                    red
+                                    {% endif %}
+                                    ; height: 15px; width: 15px; border-radius: 50%;"></div>
+                                </td>
+                                <td>
+                                    {% if server.cpu_proportion %}
+                                    {{ server.cpu_proportion }}% 
+                                    {% else %}
+                                    0% 
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if server.memory_proportion %}
+                                    {{ server.memory_proportion }}% 
+                                    {% else %}
+                                    0% 
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if server.disk_proportion %}
+                                    {{ server.disk_proportion }}% 
+                                    {% else %}
+                                    0% 
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="port_info_back">
+                                        {% if server.ports_info %}
+                                            {% for port_info in server.ports_info %}
+                                                {% if port_info.status == 'listen' %}
+                                                    <span style="color:green;">{{ port_info.port }}</span>&ensp;
+                                                {% elif port_info.status == 'closed' %}
+                                                    <span style="color:red;">{{ port_info.port }}</span>&ensp;
+                                                {% else %}
+                                                    <span style="color:blueviolet;">{{ port_info.port }}</span>&ensp;
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% else %}
+                                            <span style="color:red;">ERROR</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    {{ server.created }}
+                                </td>
+                                <td>
+                                    <a href="/{{ server.host_id }}" target="_blank">查看详情</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                    
+                </table>
+            {% endfor %}
         </div>
     {% endblock %}
