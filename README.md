@@ -1,15 +1,60 @@
-# 监控平台部署手册
+# 监控平台部署手册-v1.0.2
 
-## 一、PYTHON
+```
+# 新建文件夹
+mkdir /data/code
 
-在安装Python3之前，需要检查CentOS中有没有安装Python2的pip
+# 传输压缩包，将压缩包上传至生产环境的/data下
+scp chancey@192.168.1.100:12305 /root/monitor.tar.gz /data/
+
+# 解压
+tar xvf /data/monitor.tar.gz
+```
+
+## 一、YUM
+
+本项目离线部署之前需要搭建本地的临时YUM仓库
+
+1. 授权`rpms`文件夹
+
+   ```bash
+   chmod -R 755 /data/code/base/rpms
+   ```
+
+2. 创建YUM索引
+
+   ```bash
+   vim /etc/yum.repos.d/tmp.repo
+   
+   [centos]
+   name=centos
+   baseurl=file:///mirrors/centos7
+   gpgcheck=0
+   enable=1
+   ```
+
+3. 清空缓存
+
+   ```bash
+   yum clean all
+   ```
+
+4. 重载缓存
+
+   ```bash
+   yum makecache
+   ```
+
+## 二、PYTHON
+
+在安装Python3之前，需要检查CentOS中有没有安装Python2的pip管理器
 
 `pip list`
 
 
 > 如果提示无此命令信息，则需要安装Python2的pip管理工具。
 >
-> 实验环境为CentOS7，自带PYTHON2.7，但是没有pip管理工具。
+> 开发环境为CentOS7，自带PYTHON2.7，但是没有pip管理工具。
 
 ### 1. PIP
 
@@ -17,9 +62,11 @@
 
 > 此处要是下载特别慢的话，请访问[蓝走云](https://wwrm.lanzoub.com/isHkS0nh5jpa)下载并上传至服务器。
 
-2. 安装pip：`python get-pip.py pip==9.0.2 wheel==0.30.0 setuptools==28.8.0 --no-index --find-links=/data/file/env/package_for_py2`
+> 离线安装的话，`get-pip.py`在`/data/code/base/package_for_py2/get-pip.py`
 
-3. 更改pip加速地址为国内镜像
+2. 安装pip：`python /data/code/base/pip_package_py2/get-pip.py pip==9.0.2 wheel==0.30.0 setuptools==28.8.0 --no-index --find-links=/data/code/env/package_for_py2/`
+
+3. 更改pip加速地址为国内镜像（离线部署可不用配置，即使配置也无效）
 
 ```bash
 # 编辑 ~/.pip/pip.conf 文件，没有则创建
@@ -87,10 +134,10 @@ trusted-host=
     ```bash
     # 打开.bashrc文件： vim ~/.bashrc ,在末尾新增如下内容
     export WORKON_HOME=$HOME/.virtualenvs 
-    source /usr/bin/virtualenvwrapper.sh 
+    source /usr/bin/virtualenvwrapper.sh
     ```
 
-    >  注意：这里的`virtualenvwrapper.sh`文件不一定在如上的目录，也可能在其他位置，具体使用find可找到位置。
+    >  注意：这里的`virtualenvwrapper.sh`文件不一定在如上的目录，也可能在其他位置，使用`find`可找到具体位置。
     >
     >  `sudo find / -name virtualenvwrapper.sh`
 
@@ -100,7 +147,11 @@ trusted-host=
 
 4. 创建虚拟环境
 
-    `mkvirtualenv -p /data/server/python/python3 py3env`
+    `mkvirtualenv -p /data/server/python/python3 monitor`
+
+    > 使用如上命令创建虚拟环境，会自动创建在用户目录下`.virtualenvs`
+    >
+    > 例如使用`admin`账户创建，则虚拟环境在`/home/admin/.virtualenvs/monitor`
 
 2. 列出当前用户下的所有PYTHON虚拟环境
 
@@ -116,7 +167,7 @@ trusted-host=
 
     `rmvirtualenv py3env`
 
-## 二、MYSQL
+## 三、MYSQL
 
 - 下载地址：https://repo.huaweicloud.com/mysql/Downloads/MySQL-8.0/mysql-8.0.29-linux-glibc2.12-x86_64.tar.xz
 - 安装步骤
@@ -125,21 +176,31 @@ trusted-host=
 
    `wget https://repo.huaweicloud.com/mysql/Downloads/MySQL-8.0/mysql-8.0.29-linux-glibc2.12-x86_64.tar.xz`
 
-2. 解压文件
+2. 卸载`mariadb`
+
+   ```bash
+   # 查询已安装的包
+   rpm -qa | grep mariadb
+   
+   # 卸载查询出来的所有包
+   rpm -e mariadb-libs-5.5.68-1.el7.x86_64 --no-deps
+   ```
+
+3. 解压文件
 
    `tar -xvf mysql-8.0.29-linux-glibc2.12-x86_64.tar.xz`
 
-3. 新建一个`mysql`文件夹
+4. 新建一个`mysql`文件夹
 
    `mkdir -p /data/server/mysql/data`
 
    `mkdir -p /data/server/mysql/log`
 
-4. 将解压出来的文件全部移动到`/usr/local/mysql/`下
+5. 将解压出来的文件全部移动到`/usr/local/mysql/`下
 
    `mv mysql-8.0.29-linux-glibc2.12-x86_64/* /usr/local/mysql/`
 
-5. 创建`mysql`用户组和用户，并添加密码
+6. 创建`mysql`用户组和用户，并添加密码
 
    ```
    # 创建MySQL用户组
@@ -152,11 +213,11 @@ trusted-host=
    passwd mysql
    ```
 
-6. 备份之前的配置文件
+7. 备份之前的配置文件
 
    `mv /etc/my.cnf /etc/my.cnf.back`
 
-7. 修改配置文件`/etc/my.cnf`
+8. 修改配置文件`/etc/my.cnf`
 
    ```
    # For advice on how to change settings please see
@@ -205,7 +266,7 @@ trusted-host=
    > `character-set-server = utf8mb4`：表示mysql服务器级别默认的字符集编码，最好设置为utf8mb4；
    > `lower_case_table_names=1`：表示mysql中将表名一律转为小写；（其实取值有0、1或2，其中2是最理想的状态，但是这个配置在window、linux、macos下表现的不一致，所以还是取1吧，只不过取1后，所有的表名都强制小写了。）
 
-8. 设定访问权限
+9. 设定访问权限
 
    这里需要手动设定，MySQL包自己会用mysql用户启动进程，所以需要提前新增用户和用户组
 
@@ -217,19 +278,19 @@ trusted-host=
    chgrp -R mysql /data/server/mysql/
    ```
 
-9. 初始化数据库
+10. 初始化数据库
 
    ```bash
    /data/server/mysql/bin/mysqld --initialize --user=mysql --basedir=/data/server/mysql --datadir=/data/server/mysql/data --lower_case_table_names=1
    ```
 
-10. 创建软连接
+11. 创建软连接
 
     ```
     ln -s /data/server/mysql/bin/mysql /usr/bin/mysql
     ```
 
-11. 启动MySQL服务
+12. 启动MySQL服务
 
     ```
     # 查询MySQL是否启动
@@ -240,17 +301,17 @@ trusted-host=
     /data/server/mysql/support-files/mysql.server start
     ```
 
-12. 查看随机密码
+13. 查看随机密码
 
     `grep 'password' /data/server/mysql/log/error.log`
 
     ![image-20230311211506531](https://s2.loli.net/2023/03/11/9xQ68UzgL1XPsiH.png)
 
-13. 使用随机密码登录
+14. 使用随机密码登录
 
     `/data/server/mysql/bin/mysql -u root -p`
 
-14. 修改配置
+15. 修改配置
 
     ```
     # 修改密码
@@ -263,11 +324,11 @@ trusted-host=
     FLUSH PRIVILEGES;
     ```
 
-15. 重新启动服务
+16. 重新启动服务
 
     `/data/server/mysql/support-files/mysql.server restart`
 
-16. 服务启动制作
+17. 服务启动制作
 
     ```
     # 制作systemctl启动
@@ -297,7 +358,7 @@ trusted-host=
 
     ![image-20230311212601625](https://s2.loli.net/2023/03/11/xgn9hP314DkV6Qm.png)
 
-## 三、REDIS
+## 四、REDIS
 
 1.下载安装包：
 
@@ -375,11 +436,89 @@ Redis配置之后Redis能随系统启动执行期间会让等待用户选择端�
 
 开启Redis服务： `/etc/init.d/redis_6379 start `
 
-8.Redis测试
+8.Redis测试：` redis-cli `
 
-` redis-cli `
+## 五、NGINX
 
-## 四、PIP
+1. 安装依赖
+
+   ```bash
+   yum install -y gcc pcre pcre-devel zlib zlib-devel openssl openssl-devel
+   ```
+
+2. 下载源码包
+
+   ```bash
+   wget https://nginx.org/download/nginx-1.24.0.tar.gz
+   ```
+
+3. 解压
+
+   ```bash
+   tar -xvf nginx-1.24.0.tar.gz
+   ```
+
+4. 配置（HTTPS模块）
+
+   ```bash
+   ./configure --prefix=/data/server/nginx/ --with-http_stub_status_module --with-http_ssl_module
+   ```
+
+5. 编译安装
+
+   ```bash
+   make && make install
+   ```
+
+6. 创建软链接
+
+   ```bash
+   ln -s /data/server/nginx/sbin/nginx /usr/bin/nginx
+   ```
+
+7. 编辑服务文件
+
+   `vim /lib/systemd/system/nginx.service`
+
+   ```
+   [Unit]
+   Description=nginx service
+   After=network.target
+   
+   [Service]
+   Type=forking
+   ExecStart=/data/server/nginx/sbin/nginx
+   ExecReload=/data/server/nginx/sbin/nginx -s reload
+   ExecStop=/data/server/nginx/sbin/nginx -s stop
+   PrivateTmp=true
+   
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+8. 启动
+
+   ```bash
+   systemctl start nginx
+   ```
+
+9. 配置HTTPS
+
+   因为这里部署方式为`virtualenvwrapper`+`gunicorn`+`flask`（由`flask`发起网络应用，`gunicorn`做路由分发，然后代理到`nginx`上），仅支持Linux系统。若需要在Windows上部署，则改用`virtualenvwrapper`+`tornado`+`flask`部署（这里用`tornado`可以支持并发请求）
+
+   因此，配置`FLASK`项目的`HTTPS`则只需要配置`nginx`即可支持SSL证书校验。
+
+   配置如下：
+
+   将`./base/server/nginx.conf`复制到`/data/server/nginx/conf`下
+
+   将`./base/server/cert.pem`和`./base/server/cert.key`复制到`/data/server/nginx/conf`下
+
+10. 重载nginx
+
+    `/data/server/nginx/sbin/nginx -s reload`
+
+## 六、PIP
 
 ```bash
 cd /data/code/monitor
@@ -393,6 +532,28 @@ pip install --no-index --find-links=/data/code/monitor/pip_package -r /data/code
 >
 > 离线安装：`pip install --no-index --find-links=./packages -r ./requirements.txt`
 
-## 五、启动
+## 七、配置
+
+### 1. 服务器配置
+
+1. 关闭`selinux`
+
+   ```
+   # vim /etc/selinux/config
+   SELINUX=disabled
+   ```
+
+2. 防火墙放行
+
+   web访问需要放行防火墙，在主配置文件中的`web_port`配置，默认`5000`，且仅允许本地访问
+
+   ```bash
+   firewalld --add-port=5000/tcp --dermanent
+   firewalld --reload
+   ```
+
+### 2. 项目配置
+
+## 七、FLASK
 
 `./root/virtualenv/monitor/bin/python3 -m flask run`
