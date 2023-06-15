@@ -1,7 +1,9 @@
 import paramiko
 import os
 import sys
+import telnetlib
 
+"""
 ssh_client = paramiko.SSHClient()
 ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 ssh_client.connect(
@@ -29,3 +31,5 @@ for port in port_list:
             print("[%s]端口已被监听" % port)
 
 ssh_client.close()
+"""
+

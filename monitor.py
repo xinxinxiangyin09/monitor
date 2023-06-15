@@ -3,6 +3,7 @@ import sys
 import re
 import datetime
 import json
+import telnetlib
 
 import yaml
 import pymysql
@@ -174,17 +175,27 @@ class Monitor(object):
             disk_info = {"count_disk": count_disk, "used_disk": used_disk, "proportion": proportion, "info": disk_info_list}
 
             # port info
+            def port_status(ip, port):
+                try:
+                    tn = telnetlib.Telnet(ip, port=port)
+                    tn.close()
+                    return True
+                except ConnectionRefusedError:
+                    return False
+                except Exception as err:
+                    return err
+            
             port_info_list = []
-            for port in port_list:
-                stdin, stdout, stderr = ssh_client.exec_command("netstat -tunlp | grep %s" % port)
-                port_response = stdout.read().decode(), stderr.read().decode()
-                if "bash: netstat" in port_response[1]:
-                    port_info_list.append({"port": port, "status": "faild"})
+            for port in port_list:  # port_info format is {"port": 80, "status": "closed"}
+                result = port_status(host, port)
+                if result is True:
+                    port_info = {"port": port, "status": "listen"}
+                elif result is False:
+                    port_info = {"port": port, "status": "closed"}
                 else:
-                    if len(port_response[0]) == 0:
-                        port_info_list.append({"port": port, "status": "closed"})
-                    else:
-                        port_info_list.append({"port": port, "status": "listen"})
+                    port_info = {"port": port, "status": "unkonw"}
+                port_info_list.append(port_info)
+                
             port_info = port_info_list
 
         except paramiko.ssh_exception.AuthenticationException:

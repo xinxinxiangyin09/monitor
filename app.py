@@ -1,9 +1,16 @@
+import os
+import sys
+
 from db_tools import Data
 
 from flask import Flask, render_template, jsonify, Markup
 
 
 app = Flask(__name__)
+
+cert_path = os.path.join(sys.path[0], "certificate")
+ssl_keys = (os.path.join(cert_path, "server.crt"), os.path.join(cert_path, "server.key"))
+
 
 @app.template_filter()
 def upper_(value):

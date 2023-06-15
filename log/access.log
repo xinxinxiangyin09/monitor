@@ -1,0 +1,4 @@
+10.0.2.2 - - [15/Jun/2023:17:03:33 +0800] "GET / HTTP/1.1" 200 7131 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+10.0.2.2 - - [15/Jun/2023:17:03:33 +0800] "GET /static/base.css HTTP/1.1" 304 0 "http://127.0.0.1:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+10.0.2.2 - - [15/Jun/2023:17:03:33 +0800] "GET /static/index.css HTTP/1.1" 304 0 "http://127.0.0.1:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"
+10.0.2.2 - - [15/Jun/2023:17:03:33 +0800] "GET /favicon.ico HTTP/1.1" 200 5188 "http://127.0.0.1:8000/" "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36"

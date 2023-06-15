@@ -21,3 +21,5 @@ typing_extensions==4.1.1
 Werkzeug==2.0.3
 zipp==3.6.0
 pycrypto==2.6.1
+gunicorn==20.1.0
+setup-tools==59.6.0

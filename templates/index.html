@@ -70,15 +70,15 @@
                             {% if server.ports_info %}
                                 {% for port_info in server.ports_info %}
                                     {% if port_info.status == 'listen' %}
-                                        <span style="color:green;">{{ port_info.port }}&ensp;</span>
+                                        <span style="color:green;">{{ port_info.port }}</span>&ensp;
                                     {% elif port_info.status == 'closed' %}
-                                        <span style="color:red;">{{ port_info.port }}&ensp;</span>
+                                        <span style="color:red;">{{ port_info.port }}</span>&ensp;
                                     {% else %}
-                                    <span style="color:red;">FAILED&ensp;</span>
+                                        <span style="color:blueviolet;">{{ port_info.port }}</span>&ensp;
                                     {% endif %}
                                 {% endfor %}
                             {% else %}
-                            &emsp;
+                                <span style="color:red;">ERROR</span>
                             {% endif %}
                         </div>
                     </td>

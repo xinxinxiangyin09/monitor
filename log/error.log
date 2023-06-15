@@ -1,0 +1,9 @@
+[2023-06-15 17:01:39 +0800] [4734] [INFO] Starting gunicorn 20.1.0
+[2023-06-15 17:01:39 +0800] [4734] [INFO] Listening at: http://0.0.0.0:8000 (4734)
+[2023-06-15 17:01:39 +0800] [4734] [INFO] Using worker: sync
+[2023-06-15 17:01:39 +0800] [4737] [INFO] Booting worker with pid: 4737
+[2023-06-15 17:01:39 +0800] [4738] [INFO] Booting worker with pid: 4738
+[2023-06-15 17:01:39 +0800] [4739] [INFO] Booting worker with pid: 4739
+[2023-06-15 17:01:39 +0800] [4740] [INFO] Booting worker with pid: 4740
+[2023-06-15 17:03:58 +0800] [4739] [INFO] Parent changed, shutting down: <Worker 4739>
+[2023-06-15 17:03:58 +0800] [4739] [INFO] Worker exiting (pid: 4739)
